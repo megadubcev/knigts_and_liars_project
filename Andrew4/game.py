@@ -21,6 +21,14 @@ class Example(QWidget):
         super().__init__()
         self.initUI()
 
+    def save(self):
+        global gold
+        f = open("records", 'a', encoding="utf8")
+        name = self.name_input.text()
+        f.write(name + " " + str(gold) + "\n")
+        self.save_btn.setEnabled(False)
+
+
     def ShowInside1(self):
         global sunduk
         self.sunduk_btn1.setText(sunduk[0].thing)
@@ -44,6 +52,7 @@ class Example(QWidget):
         t = [0, 1, 2]
         for i in range(3):
             sunduk.append(Sunduk(""))
+
         i = random.choice(t)
         sunduk[i].thing = things[0]
         del t[i]
@@ -62,26 +71,47 @@ class Example(QWidget):
             del people2[level][numpeop[x]]
 
         for x in range(3):
-            j = random.choice(range(3))
+            thingsNum = [0, 1, 2, 3]
+            sundukNum = [0, 1, 2]
+            j = random.choice(range(10))
             if j < 3:
-                y = random.choice(range(len(things)))
+                y = random.choice(thingsNum)
                 if (people3[x].role and sunduk[j].thing == things[y]) or (
                         not (people3[x].role) and sunduk[j].thing != things[y]):
                     frase = "В " + str(j + 1) + " сундуке есть " + things[y]
                 else:
                     frase = "В " + str(j + 1) + " сундуке нет " + things2[y]
-            """
-            elif j < 3:
-                y = random.choice(range(len(things)))
-                if (people3[x].role and sunduk[j].thing == things[y]) or (
-                        not (people3[x].role) and sunduk[j].thing != things[y]):
-                    frase = "В " + str(j + 1) + " сундуке есть " + things[y]
+
+            elif j < 6:
+
+                y = random.choice(thingsNum)
+                del thingsNum[y]
+                z = random.choice(thingsNum)
+
+                if (people3[x].role and (sunduk[j - 3].thing == things[y] or sunduk[j - 3].thing == things[z])) or (
+                        not (people3[x].role) and not (
+                        sunduk[j - 3].thing == things[y] or sunduk[j - 3].thing == things[z])):
+                    frase = "В " + str(j - 2) + " сундуке либо " + things[y] + " либо " + things[z]
                 else:
-                    frase = "В " + str(j + 1) + " сундуке нет " + things2[y]
-            """
+                    frase = "В " + str(j - 2) + " сундуке нет ни " + things2[y] + " ни " + things2[z]
+
+            elif j < 10:
+
+                y = random.choice(sundukNum)
+                del sundukNum[y]
+                z = random.choice(sundukNum)
+
+                if (people3[x].role and (things[j - 6] == sunduk[y].thing or things[j - 6] == sunduk[z].thing)) or (
+                        not (people3[x].role) and not (
+                        things[j - 6] == sunduk[y].thing or things[j - 6] == sunduk[z].thing)):
+                    frase = things[j - 6] + " либо в " + str(y + 1) + " либо в " + str(z + 1) + " сундуке"
+                else:
+                    frase = things2[j - 6] + " нет ни в " + str(y + 1) + " ни в " + str(z + 1) + " сундуке"
+
             self.labels[x + 3].setText(people3[x].name + ": " + frase)
             self.labels[x + 3].adjustSize()
 
+            #птшем условие
             if people3[x].role:
                 kolvoKnigts += 1
             else:
@@ -124,6 +154,12 @@ class Example(QWidget):
         if lifes > 0:
             level += 1
             self.dalee.setEnabled(True)
+        else:
+            self.labels[0].setText("Введите своё имя чтобы сохранить")
+            self.labels[0].adjustSize()
+            self.name_input.setVisible(True)
+            self.save_btn.setVisible(True)
+
 
     def initUI(self):
         self.setGeometry(300, 300, 300, 300)
@@ -182,6 +218,16 @@ class Example(QWidget):
         self.dalee.resize(self.dalee.sizeHint())
         self.dalee.move(105, 140)
         self.dalee.clicked.connect(self.createInterface)
+
+        self.name_input = QLineEdit(self)
+        self.name_input.move(85, 180)
+        self.name_input.setVisible(False)
+
+        self.save_btn = QPushButton("сохранить", self)
+        self.save_btn.resize(self.save_btn.sizeHint())
+        self.save_btn.move(105, 220)
+        self.save_btn.clicked.connect(self.save)
+        self.save_btn.setVisible(False)
 
         self.createInterface()
 
